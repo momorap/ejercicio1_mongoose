@@ -73,7 +73,14 @@ router.get('/', async (req, res) => {
 
     // Ejecutar query
     const tasks = await Task.find(filters)
-      .populate('project', 'name status')
+      .populate({
+    path: 'project',          // campo a poblar
+    select: 'name status owner', // campos del proyecto
+    populate: {                // poblar owner dentro de project
+      path: 'owner',
+      select: 'name'
+    }
+  })
       .populate('assignedTo', 'name')
       .populate('dependencies', 'title status')
       .sort(sort)
@@ -104,8 +111,14 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const task = await Task.findById(req.params.id)
-      .populate('project', 'name status')
-      .populate('assignedTo', 'name')
+ .populate({
+    path: 'project',          // campo a poblar
+    select: 'name status owner', // campos del proyecto
+    populate: {                // poblar owner dentro de project
+      path: 'owner',
+      select: 'name'
+    }
+  })      .populate('assignedTo', 'name')
       .populate('dependencies', 'title status');
     
     if (!task) {
